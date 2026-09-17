@@ -32,6 +32,7 @@ public class Login {
             return "Username is not correctly formatted; please ensure that your username contains an underscore and is no more than five characters in length.";
         }
     }
+    
 
     // PASSWORD VALIDATION
     public boolean checkPasswordComplexity() {
