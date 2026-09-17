@@ -123,6 +123,7 @@ public class ChatApplication {
                         System.out.println("You have " + (maxAttempts - attempts) + " attempts left.");
                     } else {
                         System.out.println("Maximum attempts reached. Account locked.");
+                        
                     }
                 }
             }
