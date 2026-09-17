@@ -18,6 +18,7 @@ public class LoginTest {
     public void testUsernameCorrectlyFormattedBoolean() {
         Login login = new Login("kyl_1", "Ch&&sec@ke99!", "+27383968976");
         assertTrue(login.checkUserName());
+        
     }
 
     @Test
