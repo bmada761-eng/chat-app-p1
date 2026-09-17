@@ -86,6 +86,7 @@ public class ChatApplication {
                         System.out.print("Choice: ");
                         String input = scanner.nextLine().trim();
 
+                        
                         if (input.isEmpty()) {
                             System.out.println("Invalid input. Please enter a number.");
                             continue;
