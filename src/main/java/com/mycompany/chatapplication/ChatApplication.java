@@ -1,8 +1,8 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
-
 package com.mycompany.chatapplication;
+
 import java.util.Scanner;
 
 /**
@@ -74,50 +74,11 @@ public class ChatApplication {
                     System.out.println("   LOGIN SUCCESSFUL - ACCESS GRANTED");
                     System.out.println("==========================================");
 
-                    // Menu after login
-                    boolean exit = false;
-                    while (!exit) {
-                        System.out.println("\nSelect an option:");
-                        System.out.println("1. Validate Username");
-                        System.out.println("2. Validate Password");
-                        System.out.println("3. Validate Cell Phone");
-                        System.out.println("4. Exit");
+                    // PART 2 - QuickChat (only reached after a successful login).
+                    // Shows "Welcome to QuickChat." and the numeric menu:
+                    // 1) Send Messages  2) Show recently sent messages  3) Quit
+                    Quickchat.start(scanner);
 
-                        System.out.print("Choice: ");
-                        String input = scanner.nextLine().trim();
-
-                        
-                        if (input.isEmpty()) {
-                            System.out.println("Invalid input. Please enter a number.");
-                            continue;
-                        }
-
-                        int choice;
-                        try {
-                            choice = Integer.parseInt(input);
-                        } catch (NumberFormatException e) {
-                            System.out.println("Invalid input. Please enter a number.");
-                            continue;
-                        }
-
-                        switch (choice) {
-                            case 1:
-                                System.out.println(">> " + registeredUser.getUserNameMessage());
-                                break;
-                            case 2:
-                                System.out.println(">> " + registeredUser.getPasswordMessage());
-                                break;
-                            case 3:
-                                System.out.println(">> " + registeredUser.getCellPhoneMessage());
-                                break;
-                            case 4:
-                                System.out.println("Goodbye!");
-                                exit = true;
-                                break;
-                            default:
-                                System.out.println("Invalid choice. Try again.");
-                        }
-                    }
                 } else {
                     attempts++;
                     if (attempts < maxAttempts) {
