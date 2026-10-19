@@ -26,6 +26,7 @@ public class LoginTest {
         assertEquals("Welcome kyl, 1 it is great to see you.", login.getUserNameMessage());
     }
 
+    
     @Test
     public void testUsernameIncorrectlyFormattedBoolean() {
         Login login = new Login("kyle!!!!!!!", "Ch&&sec@ke99!", "+27383968976");
