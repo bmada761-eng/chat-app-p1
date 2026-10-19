@@ -25,6 +25,7 @@ class MessageTest {
     private Message msg1;   // Test case 1: valid number, will be sent
     private Message msg2;   // Test case 2: invalid number, will be discarded
 
+    
     @BeforeEach
     void setUp(@TempDir Path tmp) {
         storageFile = tmp.resolve("stored.json");
