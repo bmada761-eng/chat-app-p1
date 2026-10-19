@@ -24,6 +24,7 @@ import java.util.List;
  *    
  * 
  */
+
 public class Message {
 
     /** Maximum number of characters allowed in a message. */
