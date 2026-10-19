@@ -20,6 +20,7 @@ public class ChatApplication {
             System.out.println("   WELCOME TO THE LOGIN SYSTEM - POE");
             System.out.println("==========================================");
 
+            
             // REGISTRATION PHASE
             while (!isRegistered) {
                 System.out.println("\n--- REGISTRATION ---");
