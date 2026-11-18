@@ -23,7 +23,7 @@ public class LoginTest {
     @Test
     public void testUsernameCorrectlyFormattedMessage() {
         Login login = new Login("kyl_1", "Ch&&sec@ke99!", "+27383968976");
-        assertEquals("Welcome kyl, 1 it is great to see you.", login.getUserNameMessage());
+        assertEquals("Welcome kyl_1, it is great to see you.", login.getUserNameMessage());
     }
 
     
@@ -99,7 +99,7 @@ public class LoginTest {
     @Test
     public void testLoginSuccessfulMessage() {
         Login login = new Login("kyl_1", "Ch&&sec@ke99!", "+27383968976");
-        assertEquals("Welcome kyl, 1 it is great to see you.", login.returnLoginStatus("kyl_1", "Ch&&sec@ke99!"));
+        assertEquals("Welcome kyl_1, it is great to see you.", login.returnLoginStatus("kyl_1", "Ch&&sec@ke99!"));
     }
 
     @Test

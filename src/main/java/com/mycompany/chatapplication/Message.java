@@ -4,36 +4,29 @@
  */
 package com.mycompany.chatapplication;
 
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Represents one QuickChat message and holds the validation, hashing,
- * sending and storing logic described in the Part 2 brief.
+ * sending and storing logic described in the Part 2 and Part 3 briefs.
+ * The arrays that collect the messages live in MessageManager.
  *
  * References / attribution:
  *  - The JSON file format (arrays, objects, strings and the escape rules used
- *    in jsonEscape) follows the JSON specifications
- *    
- * 
+ *
  */
-
 public class Message {
 
     /** Maximum number of characters allowed in a message. */
     public static final int MAX_LENGTH = 250;
 
     private static final SecureRandom RANDOM = new SecureRandom();
-
-    /** Messages sent while the program is running. */
-    private static final List<Message> sentMessages = new ArrayList<>();
 
     /** File that stored messages are written to (changeable for testing). */
     private static Path storagePath = Paths.get("storedMessages.json");
@@ -43,13 +36,14 @@ public class Message {
     private final String recipient;     // cell number including international code
     private final String text;          // the message itself
     private final String messageHash;   // e.g. 00:0:HITONIGHT
+    private String sender = "Unknown";  // the logged-in user who sent the message
 
     /** Creates a message with a randomly generated ID. */
     public Message(int messageNumber, String recipient, String text) {
         this(generateMessageId(), messageNumber, recipient, text);
     }
 
-    /** Creates a message with a supplied ID (used by the unit tests). */
+    /** Creates a message with a supplied ID (used by the unit tests and when reading the JSON file). */
     public Message(String messageId, int messageNumber, String recipient, String text) {
         this.messageId = messageId;
         this.messageNumber = messageNumber;
@@ -139,25 +133,27 @@ public class Message {
     }
 
     /**
-     * Lets the user send (1), disregard (2) or store (3) the message and
-     * returns the matching confirmation text.
+     * Lets the user send (1), disregard (2) or store (3) the message, adds it
+     * to the matching array in MessageManager and returns the confirmation text.
      */
     public String SentMessage(int choice) {
         switch (choice) {
             case 1:
-                sentMessages.add(this);
+                MessageManager.addSent(this);
                 return "Message successfully sent.";
             case 2:
+                MessageManager.addDisregarded(this);
                 return "Press 0 to delete the message.";
             case 3:
                 storeMessage();
+                MessageManager.addStored(this);
                 return "Message successfully stored.";
             default:
                 return "Invalid option. Please choose 1, 2 or 3.";
         }
     }
 
-    /** Full details in the required order: ID, hash, recipient, message. */
+    /** Details in the required order: ID, hash, recipient, message. */
     public String details() {
         return "Message ID: " + messageId + "\n"
                 + "Message Hash: " + messageHash + "\n"
@@ -165,10 +161,19 @@ public class Message {
                 + "Message: " + text;
     }
 
+    /** Full details used in the Part 3 reports: ID, hash, sender, recipient, message. */
+    public String fullDetails() {
+        return "Message ID: " + messageId + "\n"
+                + "Message Hash: " + messageHash + "\n"
+                + "Sender: " + sender + "\n"
+                + "Recipient: " + recipient + "\n"
+                + "Message: " + text;
+    }
+
     /** Returns the details of every message sent while the program runs. */
     public static String printMessages() {
         StringBuilder sb = new StringBuilder();
-        for (Message m : sentMessages) {
+        for (Message m : MessageManager.getSentMessages()) {
             sb.append(m.details()).append("\n\n");
         }
         return sb.toString().trim();
@@ -176,22 +181,31 @@ public class Message {
 
     /** Returns the total number of messages sent. */
     public static int returnTotalMessages() {
-        return sentMessages.size();
+        return MessageManager.getSentMessages().size();
+    }
+
+    // ------------------------------------------------------------------
+    // JSON storage (written by hand - see the references in the class comment)
+    // ------------------------------------------------------------------
+
+    /** This message as one JSON object, ready to go inside the JSON array. */
+    private String toJsonEntry() {
+        return "  {\n"
+                + "    \"messageId\": \"" + jsonEscape(messageId) + "\",\n"
+                + "    \"messageNumber\": " + messageNumber + ",\n"
+                + "    \"messageHash\": \"" + jsonEscape(messageHash) + "\",\n"
+                + "    \"sender\": \"" + jsonEscape(sender) + "\",\n"
+                + "    \"recipient\": \"" + jsonEscape(recipient) + "\",\n"
+                + "    \"message\": \"" + jsonEscape(text) + "\"\n"
+                + "  }";
     }
 
     /**
      * Appends this message to the JSON file (created if it does not exist).
-     * The file holds a JSON array, e.g. [ {...}, {...} ]. The format follows
-     * the JSON specification - see the references in the class comment.
+     * The file holds a JSON array, e.g. [ {...}, {...} ].
      */
     public void storeMessage() {
-        String entry = "  {\n"
-                + "    \"messageId\": \"" + jsonEscape(messageId) + "\",\n"
-                + "    \"messageNumber\": " + messageNumber + ",\n"
-                + "    \"messageHash\": \"" + jsonEscape(messageHash) + "\",\n"
-                + "    \"recipient\": \"" + jsonEscape(recipient) + "\",\n"
-                + "    \"message\": \"" + jsonEscape(text) + "\"\n"
-                + "  }";
+        String entry = toJsonEntry();
         try {
             String existing = Files.exists(storagePath)
                     ? Files.readString(storagePath, StandardCharsets.UTF_8).trim()
@@ -208,6 +222,32 @@ public class Message {
             Files.writeString(storagePath, json, StandardCharsets.UTF_8);
         } catch (IOException e) {
             System.out.println("Could not store message: " + e.getMessage());
+        }
+    }
+
+    /** Replaces the contents of the JSON file with the given messages (used after a delete). */
+    public static void writeStoredFile(List<Message> messages) {
+        StringBuilder json = new StringBuilder("[");
+        for (int i = 0; i < messages.size(); i++) {
+            json.append(i == 0 ? "\n" : ",\n").append(messages.get(i).toJsonEntry());
+        }
+        json.append(messages.isEmpty() ? "]" : "\n]");
+        try {
+            Files.writeString(storagePath, json.toString(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            System.out.println("Could not update the stored messages file: " + e.getMessage());
+        }
+    }
+
+    /** Returns the text of the JSON file, or an empty string if it does not exist yet. */
+    public static String readStorageFile() {
+        try {
+            return Files.exists(storagePath)
+                    ? Files.readString(storagePath, StandardCharsets.UTF_8)
+                    : "";
+        } catch (IOException e) {
+            System.out.println("Could not read the stored messages file: " + e.getMessage());
+            return "";
         }
     }
 
@@ -236,13 +276,15 @@ public class Message {
         return sb.toString();
     }
 
-    // ---- getters and test helpers ----
+    // ---- getters, setters and test helpers ----
     public String getMessageId() { return messageId; }
     public int getMessageNumber() { return messageNumber; }
     public String getMessageHash() { return messageHash; }
     public String getRecipient() { return recipient; }
     public String getText() { return text; }
+    public String getSender() { return sender; }
+    public void setSender(String sender) { this.sender = sender; }
 
     public static void setStoragePath(Path path) { storagePath = path; }
-    public static void resetSentMessages() { sentMessages.clear(); }
+    public static void resetSentMessages() { MessageManager.resetAll(); }
 }
