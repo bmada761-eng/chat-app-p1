@@ -14,7 +14,7 @@ import java.util.Scanner;
  */
 public class Quickchat {
 
-    
+  
     /** Entry point. Re-uses the Scanner created in ChatApplication. */
     public static void start(Scanner in, String username) {
         // Read the JSON file into the stored messages array
