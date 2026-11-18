@@ -20,7 +20,6 @@ public class ChatApplication {
             System.out.println("   WELCOME TO THE LOGIN SYSTEM - POE");
             System.out.println("==========================================");
 
-            
             // REGISTRATION PHASE
             while (!isRegistered) {
                 System.out.println("\n--- REGISTRATION ---");
@@ -75,10 +74,10 @@ public class ChatApplication {
                     System.out.println("   LOGIN SUCCESSFUL - ACCESS GRANTED");
                     System.out.println("==========================================");
 
-                    // PART 2 - QuickChat (only reached after a successful login).
+                    // PARTS 2 & 3 - QuickChat (only reached after a successful login).
                     // Shows "Welcome to QuickChat." and the numeric menu:
-                    // 1) Send Messages  2) Show recently sent messages  3) Quit
-                    Quickchat.start(scanner);
+                    // 1) Send Messages  2) Show recently sent messages  3) Quit  4) Stored Messages
+                    Quickchat.start(scanner, loginUsername);
 
                 } else {
                     attempts++;
